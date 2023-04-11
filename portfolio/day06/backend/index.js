@@ -12,7 +12,7 @@ import {
 
 const app = express();
 app.use(express.json());
-app.use(cors());
+app.use(cors({ origin: true, credentials: true }));
 
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerJSDoc(options)));
 
@@ -76,7 +76,9 @@ app.post("/tokens/phone", async (req, res) => {
 });
 
 app.post("/users", (req, res) => {
-  const user = req.body.myuser;
+  const user = req.body;
+  console.log("1111", user);
+  console.log("useremail", user.email);
 
   // 1. 이메일이 정상인지 확인(1-존재여부, 2-"@"포함여부)
   const isValid = checkValidationEmail(user.email);
