@@ -95,6 +95,38 @@ app.get("/tokens/phone", async (req, res) => {
   res.send(result);
 });
 
+app.patch("/tokens/phone", async (req, res) => {
+  try {
+    const phoneNumber = req.body.phoneNumber;
+    const tokenNumber = req.body.tokenNumber;
+
+    console.log("phoneNumber", phoneNumber);
+    console.log("tokenNumber", tokenNumber);
+
+    // 1. 핸드폰번호 자릿수 맞는지 확인하기
+    const isPhoneValid = checkValidationPhone(phoneNumber);
+    console.log("isValid", await isPhoneValid);
+    const findPhoneAndToken = await Token.find({ phone: phoneNumber });
+    console.log(findPhoneAndToken);
+
+    if (isPhoneValid) {
+      const isTokenValid = findPhoneAndToken.token;
+      console.log("isTokenValid", isTokenValid);
+
+      if (isTokenValid === tokenNumber) {
+        await Token.updateOne(
+          { token: tokenNumber },
+          { $set: { isAuth: true } }
+        );
+        return res.send(true);
+      }
+      return res.send(false);
+    }
+  } catch (e) {
+    console.log(e);
+  }
+});
+
 app.post("/users", (req, res) => {
   const user = req.body;
 
